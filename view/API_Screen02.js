@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState,useCallback} from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   Image,
   SafeAreaView,
@@ -12,15 +13,18 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import axios from "axios";
 
-export default function API_Screen01() {
+
+export default function API_Screen02({navigation}) {
   const [user, setUser] = useState([]);
 
-  useEffect(() => {
-    axios
-      .get("https://67055f04031fd46a830fb4fb.mockapi.io/users")
-      .then((response) => setUser(response.data))
-      .catch((err) => console.log(err));
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      axios
+        .get("https://67055f04031fd46a830fb4fb.mockapi.io/users")
+        .then((response) => setUser(response.data))
+        .catch((err) => console.log(err));
+    }, [])
+  );
 
   const displayContent = ({ item }) => {
     return (
@@ -30,6 +34,7 @@ export default function API_Screen01() {
       </View>
     );
   };
+  
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -60,11 +65,12 @@ export default function API_Screen01() {
         <View style={styles.add}>
           <TouchableOpacity
             style={styles.button1}
-            onPress={() => navigation.navigate("API_Screen02")}
+            onPress={() => navigation.navigate("API_Screen03")}
           >
             <AntDesign style={styles.plus} name="plus"></AntDesign>
           </TouchableOpacity>
         </View>
+        
       </View>
     </SafeAreaView>
   );
