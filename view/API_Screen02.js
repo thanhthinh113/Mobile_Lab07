@@ -1,4 +1,5 @@
-import React, { useState,useCallback} from "react";
+import React, { useState, useCallback } from "react";
+import { Alert } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import {
   Image,
@@ -13,8 +14,7 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import axios from "axios";
 
-
-export default function API_Screen02({navigation}) {
+export default function API_Screen02({ navigation }) {
   const [user, setUser] = useState([]);
 
   useFocusEffect(
@@ -26,15 +26,52 @@ export default function API_Screen02({navigation}) {
     }, [])
   );
 
+  const deleteUser = (id) => {
+    Alert.alert(
+      "Delete User",
+      "Are you sure you want to delete this user?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: () => {
+            axios
+              .delete(`https://67055f04031fd46a830fb4fb.mockapi.io/users/${id}`)
+              .then(() => {
+                // Xóa user khỏi danh sách state
+                setUser((prevUsers) =>
+                  prevUsers.filter((item) => item.id !== id)
+                );
+              })
+              .catch((err) => console.log("Error deleting user:", err));
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   const displayContent = ({ item }) => {
     return (
       <View style={styles.card}>
         <Text style={styles.cardContent}>{item.content}</Text>
-        <AntDesign style={styles.ant} name="edit"></AntDesign>
+        <View style={styles.CRUD}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("API_Screen04", { id: item.id })}
+          >
+            <AntDesign style={styles.ant} name="edit"></AntDesign>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => deleteUser(item.id)}>
+            <AntDesign style={styles.ant} name="delete"></AntDesign>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   };
-  
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -70,7 +107,6 @@ export default function API_Screen02({navigation}) {
             <AntDesign style={styles.plus} name="plus"></AntDesign>
           </TouchableOpacity>
         </View>
-        
       </View>
     </SafeAreaView>
   );
@@ -90,6 +126,10 @@ const styles = StyleSheet.create({
   },
   ant: {
     fontSize: 24,
+    paddingLeft: 10,
+  },
+  CRUD: {
+    flexDirection: "row",
   },
   infor: {
     flexDirection: "row",
@@ -136,17 +176,17 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
 
-  card:{
-    backgroundColor: 'grey',
+  card: {
+    backgroundColor: "grey",
     padding: 18,
     marginVertical: 8,
     marginHorizontal: 16,
-    borderRadius:30,
-    flexDirection:"row",
-    justifyContent:"space-between"
+    borderRadius: 30,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
-  cardContent:{
-    fontWeight:"bold",
-    fontSize:18
+  cardContent: {
+    fontWeight: "bold",
+    fontSize: 18,
   },
 });

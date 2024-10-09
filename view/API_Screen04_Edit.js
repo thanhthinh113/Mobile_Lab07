@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Alert } from 'react-native';
 import {
   Image,
@@ -12,23 +12,30 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import axios from "axios";
 
-export default function API_Screen01({ navigation }) {
+export default function API_Screen04({ navigation,route }) {
+  const { id } = route.params; 
   const [user, setUser] = useState(""); 
 
-  const addJob = () => {
-    if (!user) {
-      alert("Please input a user");
-      return;
+  useEffect(() => {
+    if (id) {
+      axios
+        .get(`https://67055f04031fd46a830fb4fb.mockapi.io/users/${id}`)
+        .then((res) => {
+          setUser(res.data.content); 
+        })
+        .catch((err) => console.log(err));
     }
+  }, [id]); 
+
+  const updateUser = () => {
     axios
-      .post("https://67055f04031fd46a830fb4fb.mockapi.io/users", {
+      .put(`https://67055f04031fd46a830fb4fb.mockapi.io/users/${id}`, {
         content: user,
       })
-      .then((response) => {
-        console.log("User added:", response.data);
+      .then(() => {
         Alert.alert(
           "Success",
-          "User added successfully!",
+          "User updated successfully!",
           [
             {
               text: "OK",
@@ -39,11 +46,10 @@ export default function API_Screen01({ navigation }) {
         );
       })
       .catch((error) => {
-        console.error("Error adding user:", error);
+        console.error("Error updating user:", error);
         Alert.alert("Error", "Something went wrong!");
       });
   };
-  
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -59,25 +65,27 @@ export default function API_Screen01({ navigation }) {
               <Text style={styles.textContent}>Have a great day ahead</Text>
             </View>
           </View>
-          <AntDesign style={styles.ant} name="arrowleft"></AntDesign>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <AntDesign style={styles.ant} name="arrowleft" />
+          </TouchableOpacity>
         </View>
         <View style={styles.content}>
-          <Text style={styles.contentText}>ADD YOUR JOB</Text>
+          <Text style={styles.contentText}>EDIT USER</Text>
         </View>
         <View style={styles.inputAdd}>
           <TextInput
             style={styles.input}
-            placeholder="input your user"
-            value={user} 
-            onChangeText={(text) => setUser(text)} 
+            placeholder="Edit user content"
+            value={user}
+            onChangeText={(text) => setUser(text)}
           />
         </View>
         <View style={styles.button}>
           <TouchableOpacity
             style={styles.button1}
-            onPress={addJob} 
+            onPress={updateUser}
           >
-            <Text style={styles.buttonText1}>FINISH</Text>
+            <Text style={styles.buttonText1}>UPDATE</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.footer}>
